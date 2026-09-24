@@ -1,0 +1,8 @@
+forge-std/=lib/forge-std/src/
+solady/=lib/solady/src/
+seadrop/=lib/seadrop/src/
+ERC721A/=lib/seadrop/lib/ERC721A/contracts/
+solmate/=lib/seadrop/lib/solmate/src/
+openzeppelin-contracts/=lib/seadrop/lib/openzeppelin-contracts/contracts/
+utility-contracts/=lib/seadrop/lib/utility-contracts/src/
+ds-test/=lib/forge-std/lib/ds-test/src/

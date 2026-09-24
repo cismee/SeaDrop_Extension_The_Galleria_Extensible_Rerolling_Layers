@@ -1,0 +1,65 @@
+# The Galleria — Foundry config
+#
+# Compiler is pinned to 0.8.17 because OpenSea's seadrop uses a *fixed*
+# `pragma solidity 0.8.17;` (not a caret range). Everything in this repo that
+# imports ERC721SeaDrop must therefore compile at exactly 0.8.17.
+#
+# Consequence worth knowing: the `block.prevrandao` *identifier* was only added
+# to Solidity in 0.8.18. At 0.8.17 we read the same post-merge opcode via
+# `block.difficulty` (see SamplingLib._entropyBase). Same value, same opcode
+# (0x44 / PREVRANDAO) on any post-merge chain — purely a language-version detail.
+
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+test = 'test'
+script = 'script'
+solc_version = '0.8.17'
+optimizer = true
+optimizer_runs = 1_000_000
+bytecode_hash = 'none'
+# evm_version intentionally left at the 0.8.17 default (london). block.difficulty
+# reads PREVRANDAO on post-merge chains regardless of the compile-time target.
+fs_permissions = [
+    { access = 'read', path = './test/fixtures' },
+    { access = 'read', path = './art' },
+]
+ffi = false
+
+# Light fuzz/invariant settings used by the default `forge test`.
+[profile.default.fuzz]
+runs = 256
+
+[profile.default.invariant]
+runs = 256
+depth = 32
+fail_on_revert = false
+
+# Heavier property-testing profile: `FOUNDRY_PROFILE=heavy forge test`.
+# The uniqueness invariant is the priority — this profile drives the fuzzer
+# hard (many runs, deep call sequences) to try to break injectivity.
+[profile.heavy]
+src = 'src'
+out = 'out'
+libs = ['lib']
+solc_version = '0.8.17'
+optimizer = true
+optimizer_runs = 1_000_000
+bytecode_hash = 'none'
+
+[profile.heavy.fuzz]
+runs = 5_000
+
+# Deeper invariant runs. The injectivity assertion is O(n^2) in live-token count,
+# so depth is kept moderate; raise runs/depth further for an overnight soak.
+[profile.heavy.invariant]
+runs = 500
+depth = 64
+fail_on_revert = false
+
+[rpc_endpoints]
+mainnet = "${RPC_URL}"
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
